@@ -16,6 +16,8 @@
 
 package com.android.launcher3.settings;
 
+import static com.pixeldust.launcher.OverlayCallbackImpl.KEY_ENABLE_MINUS_ONE;
+
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -56,7 +58,6 @@ public class SettingsHomescreen extends Activity
     private static final int DELAY_HIGHLIGHT_DURATION_MILLIS = 600;
     public static final String SAVE_HIGHLIGHTED_KEY = "android:preference_highlighted";
     private static final String SUGGESTIONS_KEY = "pref_suggestions";
-
     private static final String DPS_PACKAGE = "com.google.android.as";
 
     @Override
@@ -112,6 +113,10 @@ public class SettingsHomescreen extends Activity
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;
 
+        protected static final String GSA_PACKAGE = "com.google.android.googlequicksearchbox";
+
+        private Preference mShowGoogleAppPref;
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             final Bundle args = getArguments();
@@ -151,8 +156,26 @@ public class SettingsHomescreen extends Activity
                 case SUGGESTIONS_KEY:
                     // Show if Device Personalization Services is present.
                     return PixeldustUtils.isPackageEnabled(getActivity(), DPS_PACKAGE);
+                case KEY_ENABLE_MINUS_ONE:
+                    mShowGoogleAppPref = preference;
+                    updateIsGoogleAppEnabled();
+                    return true;
             }
             return true;
+        }
+
+        public static boolean isGSAEnabled(Context context) {
+            try {
+                return context.getPackageManager().getApplicationInfo(GSA_PACKAGE, 0).enabled;
+            } catch (PackageManager.NameNotFoundException e) {
+                return false;
+            }
+        }
+
+        private void updateIsGoogleAppEnabled() {
+            if (mShowGoogleAppPref != null) {
+                mShowGoogleAppPref.setEnabled(isGSAEnabled(getContext()));
+            }
         }
 
         @Override
@@ -166,6 +189,7 @@ public class SettingsHomescreen extends Activity
                     mPreferenceHighlighted = true;
                 }
             }
+            updateIsGoogleAppEnabled();
         }
 
         private PreferenceHighlighter createHighlighter() {
