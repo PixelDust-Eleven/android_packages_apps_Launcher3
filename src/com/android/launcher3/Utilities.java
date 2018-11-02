@@ -129,6 +129,8 @@ public final class Utilities {
      */
     public static final int EDGE_NAV_BAR = 1 << 8;
 
+    public static final String KEY_SHOW_SEARCHBAR = "pref_show_searchbar";
+
     private static final long WAIT_BEFORE_RESTART = 250;
 
     /**
@@ -712,5 +714,10 @@ public final class Utilities {
     public static boolean isWorkspaceEditAllowed(Context context) {
         SharedPreferences prefs = getPrefs(context.getApplicationContext());
         return prefs.getBoolean(InvariantDeviceProfile.KEY_WORKSPACE_EDIT, true);
+    }
+
+    public static boolean showQSB(Context context) {
+        SharedPreferences prefs = getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_SHOW_SEARCHBAR, true);
     }
 }

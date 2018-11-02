@@ -41,4 +41,8 @@
 
     <!-- Folder titles -->
     <string name="google_folder_title" translatable="false">Google</string>
+
+    <!-- Show searchbar -->
+    <string name="show_searchbar_title">Show search bar</string>
+    <string name="show_searchbar_summary">Show the search bar on the home screen</string>
 </resources>
