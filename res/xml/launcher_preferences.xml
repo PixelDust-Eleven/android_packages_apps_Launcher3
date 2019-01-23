@@ -67,4 +67,8 @@
         android:title="@string/drawer_show_labels"
         android:defaultValue="true"
         android:persistent="true" />
+
+    <Preference
+        android:key="pref_trust_apps"
+        android:title="@string/trust_apps_manager_name" />
 </androidx.preference.PreferenceScreen>
