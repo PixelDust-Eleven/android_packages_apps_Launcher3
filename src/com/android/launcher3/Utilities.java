@@ -136,7 +136,6 @@ public final class Utilities {
      * add extra logging and not for changing the app behavior.
      */
     public static final boolean IS_DEBUG_DEVICE =
-            Build.TYPE.toLowerCase(Locale.ROOT).contains("debug") ||
             Build.TYPE.toLowerCase(Locale.ROOT).equals("eng");
 
     public static boolean isDevelopersOptionsEnabled(Context context) {
