@@ -8,6 +8,10 @@
         android:defaultValue="true"
         android:persistent="true"/>
 
+    <PreferenceCategory
+        android:key="home_general_category"
+        android:title="@string/home_general_title">
+
     <SwitchPreference
         android:defaultValue="true"
         android:key="pref_enable_minus_one"
@@ -34,4 +38,6 @@
         android:summaryOn="@string/settings_edit_allow_summary_on"
         android:summaryOff="@string/settings_edit_allow_summary_off" />
 
-</androidx.preference.PreferenceScreen> 
+    </PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

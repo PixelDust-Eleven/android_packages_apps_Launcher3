@@ -72,4 +72,7 @@
     <string name="smartspace_preferences">Preferences</string>
     <string name="show_quickspace_title">At A Glance</string>
     <string name="show_quickspace_summary">Show at the top of your Home screen</string>
+
+    <!-- Sub categories -->
+    <string name="home_general_title">General</string>
 </resources>
