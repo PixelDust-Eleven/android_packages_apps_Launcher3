@@ -42,7 +42,8 @@
     <!-- Folder titles -->
     <string name="google_folder_title" translatable="false">Google</string>
 
-    <!-- Show searchbar -->
-    <string name="show_searchbar_title">Show search bar</string>
-    <string name="show_searchbar_summary">Show the search bar on the home screen</string>
+    <!-- SmartSpace -->
+    <string name="smartspace_preferences">Preferences</string>
+    <string name="show_quickspace_title">At A Glance</string>
+    <string name="show_quickspace_summary">Show at the top of your Home screen</string>
 </resources>

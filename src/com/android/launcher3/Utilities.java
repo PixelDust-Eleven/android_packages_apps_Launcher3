@@ -129,7 +129,7 @@ public final class Utilities {
      */
     public static final int EDGE_NAV_BAR = 1 << 8;
 
-    public static final String KEY_SHOW_SEARCHBAR = "pref_show_searchbar";
+    public static final String KEY_SHOW_SEARCHBAR = "pref_show_quickspace";
 
     private static final long WAIT_BEFORE_RESTART = 250;
 
