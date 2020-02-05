@@ -130,6 +130,7 @@ public final class Utilities {
     public static final int EDGE_NAV_BAR = 1 << 8;
 
     public static final String KEY_SHOW_SEARCHBAR = "pref_show_quickspace";
+    public static final String SLEEP_GESTURE = "pref_sleep_gesture";
 
     private static final long WAIT_BEFORE_RESTART = 250;
 
@@ -698,6 +699,10 @@ public final class Utilities {
         public int getIntrinsicWidth() {
             return mSize;
         }
+    }
+
+    public static boolean useSleepGesture(Context context) {
+        return getPrefs(context).getBoolean(SLEEP_GESTURE, false);
     }
 
     public static void restart(final Context context) {
