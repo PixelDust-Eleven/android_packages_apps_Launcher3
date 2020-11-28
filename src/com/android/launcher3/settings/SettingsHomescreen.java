@@ -55,6 +55,9 @@ public class SettingsHomescreen extends Activity
     public static final String EXTRA_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args";
     private static final int DELAY_HIGHLIGHT_DURATION_MILLIS = 600;
     public static final String SAVE_HIGHLIGHTED_KEY = "android:preference_highlighted";
+    private static final String SUGGESTIONS_KEY = "pref_suggestions";
+
+    private static final String DPS_PACKAGE = "com.google.android.as";
 
     @Override
     protected void onCreate(final Bundle bundle) {
@@ -144,9 +147,13 @@ public class SettingsHomescreen extends Activity
          * will remove that preference from the list.
          */
         protected boolean initPreference(Preference preference) {
-            //switch (preference.getKey()) {
-            //}
-min        }
+            switch (preference.getKey()) {
+                case SUGGESTIONS_KEY:
+                    // Show if Device Personalization Services is present.
+                    return PixeldustUtils.isPackageEnabled(getActivity(), DPS_PACKAGE);
+            }
+            return true;
+        }
 
         @Override
         public void onResume() {
