@@ -18,9 +18,11 @@ package com.android.launcher3;
 
 import static android.content.pm.ActivityInfo.CONFIG_ORIENTATION;
 import static android.content.pm.ActivityInfo.CONFIG_SCREEN_SIZE;
+import static android.content.pm.ActivityInfo.CONFIG_UI_MODE;
 import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
 
 import static com.android.launcher3.AbstractFloatingView.TYPE_ALL;
+import static com.android.launcher3.AbstractFloatingView.TYPE_ICON_SURFACE;
 import static com.android.launcher3.AbstractFloatingView.TYPE_REBIND_SAFE;
 import static com.android.launcher3.AbstractFloatingView.TYPE_SNACKBAR;
 import static com.android.launcher3.InstallShortcutReceiver.FLAG_DRAG_AND_DROP;
@@ -169,6 +171,7 @@ import com.android.launcher3.util.TraceHelper;
 import com.android.launcher3.util.UiThreadHelper;
 import com.android.launcher3.util.ViewOnDrawExecutor;
 import com.android.launcher3.views.ActivityContext;
+import com.android.launcher3.views.FloatingSurfaceView;
 import com.android.launcher3.views.OptionsPopupView;
 import com.android.launcher3.views.ScrimView;
 import com.android.launcher3.widget.LauncherAppWidgetHostView;
@@ -510,6 +513,7 @@ public class Launcher extends StatefulActivity<LauncherState> implements Launche
     public void onEnterAnimationComplete() {
         super.onEnterAnimationComplete();
         mRotationHelper.setCurrentTransitionRequest(REQUEST_NONE);
+        AbstractFloatingView.closeOpenViews(this, false, TYPE_ICON_SURFACE);
     }
 
     @Override
@@ -924,8 +928,10 @@ public class Launcher extends StatefulActivity<LauncherState> implements Launche
         DiscoveryBounce.showForHomeIfNeeded(this);
     }
 
+    protected void handlePendingActivityRequest() { }
 
     private void logStopAndResume(int command) {
+        if (mPendingExecutor != null) return;
         int pageIndex = mWorkspace.isOverlayShown() ? -1 : mWorkspace.getCurrentPage();
         int containerType = mStateManager.getState().containerType;
 
@@ -1106,7 +1112,11 @@ public class Launcher extends StatefulActivity<LauncherState> implements Launche
         int stateOrdinal = savedState.getInt(RUNTIME_STATE, NORMAL.ordinal);
         LauncherState[] stateValues = LauncherState.values();
         LauncherState state = stateValues[stateOrdinal];
-        if (!state.shouldDisableRestore()) {
+
+        NonConfigInstance lastInstance = (NonConfigInstance) getLastNonConfigurationInstance();
+        boolean forceRestore = lastInstance != null
+                && (lastInstance.config.diff(mOldConfig) & CONFIG_UI_MODE) != 0;
+        if (forceRestore || !state.shouldDisableRestore()) {
             mStateManager.goToState(state, false /* animated */);
         }
 
@@ -1346,6 +1356,13 @@ public class Launcher extends StatefulActivity<LauncherState> implements Launche
         closeContextMenu();
     }
 
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        NonConfigInstance instance = new NonConfigInstance();
+        instance.config = new Configuration(mOldConfig);
+        return instance;
+    }
+
     public AllAppsTransitionController getAllAppsController() {
         return mAllAppsController;
     }
@@ -1431,7 +1448,8 @@ public class Launcher extends StatefulActivity<LauncherState> implements Launche
                 if (!isInState(NORMAL)) {
                     // Only change state, if not already the same. This prevents cancelling any
                     // animations running as part of resume
-                    mStateManager.goToState(NORMAL);
+                    mStateManager.goToState(NORMAL, mStateManager.shouldAnimateStateChange(),
+                            this::handlePendingActivityRequest);
                 }
 
                 // Reset the apps view
@@ -1456,11 +1474,23 @@ public class Launcher extends StatefulActivity<LauncherState> implements Launche
                 mLauncherCallbacks.onHomeIntent(internalStateHandled);
             }
             mOverlayManager.hideOverlay(isStarted() && !isForceInvisible());
+            handleGestureContract(intent);
         } else if (Intent.ACTION_ALL_APPS.equals(intent.getAction())) {
             getStateManager().goToState(ALL_APPS, alreadyOnHome);
         }
 
         TraceHelper.INSTANCE.endSection(traceToken);
+    }
+
+    /**
+     * Handles gesture nav contract
+     */
+    protected void handleGestureContract(Intent intent) {
+        GestureNavContract gnc = GestureNavContract.fromIntent(intent);
+        if (gnc != null) {
+            AbstractFloatingView.closeOpenViews(this, false, TYPE_ICON_SURFACE);
+            FloatingSurfaceView.show(this, gnc);
+        }
     }
 
     /**
@@ -2734,5 +2764,9 @@ public class Launcher extends StatefulActivity<LauncherState> implements Launche
     public interface OnResumeCallback {
 
         void onLauncherResume();
+    }
+
+    private static class NonConfigInstance {
+        public Configuration config;
     }
 }
